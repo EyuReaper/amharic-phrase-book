@@ -16,7 +16,7 @@ const PhraseTable: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    fetch('public/amharic_phrase.json')
+    fetch('/amharic_phrase.json')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
