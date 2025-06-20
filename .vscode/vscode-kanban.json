@@ -1,0 +1,22 @@
+{
+  "todo": [],
+  "in-progress": [
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "styling",
+      "creation_time": "2025-06-20T13:29:41.471Z",
+      "description": {
+        "content": "make the background for the categorycard with pictures",
+        "mime": "text/markdown"
+      },
+      "id": "1",
+      "prio": 2,
+      "references": [],
+      "title": "background image for category cards"
+    }
+  ],
+  "testing": [],
+  "done": []
+}

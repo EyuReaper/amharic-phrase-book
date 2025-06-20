@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 
-// Define the structure for a phrase
-export interface Phrase { // Exported to be a module
+//  the structure for a phrase
+export interface Phrase {
   id: string;
   amharic: string;
   english: string;
@@ -9,8 +9,8 @@ export interface Phrase { // Exported to be a module
   notes?: string;
 }
 
-// Define the structure for a category
-export interface Category { // Exported to be a module
+// Defined the structure for a category
+export interface Category {
   id: string; // Unique ID for the category
   name: string; // Display name for the category (e.g., "Basic")
   phrases: Phrase[];
@@ -18,7 +18,7 @@ export interface Category { // Exported to be a module
 
 // CategoryCard Component
 // Component for a single category card on the category list page
-export const CategoryCard: React.FC<{ // Exported to be a module
+export const CategoryCard: React.FC<{
   category: Category;
   onSelect: (category: Category) => void;
 }> = React.memo(({ category, onSelect }) => {
@@ -34,7 +34,7 @@ export const CategoryCard: React.FC<{ // Exported to be a module
 });
 
 // Component for displaying the list of categories
-export const CategoryListPage: React.FC<{ // Exported to be a module
+export const CategoryListPage: React.FC<{
   categories: Category[];
   searchTerm: string;
   onSearchChange: (term: string) => void;
@@ -95,7 +95,7 @@ export const CategoryListPage: React.FC<{ // Exported to be a module
 
 // PhraseListPage Component
 // Component for displaying phrases within a selected category
-export const PhraseListPage: React.FC<{ // Exported to be a module
+export const PhraseListPage: React.FC<{
   category: Category;
   onBack: () => void;
 }> = ({ category, onBack }) => {
@@ -106,7 +106,7 @@ export const PhraseListPage: React.FC<{ // Exported to be a module
         className="flex items-center px-4 py-2 mb-4 font-semibold text-gray-800 transition duration-200 bg-gray-200 rounded-lg hover:bg-gray-300"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M12.707 5.293a1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
         </svg>
         Back to Categories
       </button>
@@ -835,7 +835,6 @@ const rawPhraseData = [
   {
     "Category": "Basic/መሰረታዊ/",
     "Amharic phrase": "እወድሻለሁ።",
-    "English translation": "I like you (as a friend)",
     "Phonetic translation": "əwäddəšallähw",
     "Notes": "Female"
   },
@@ -1233,7 +1232,6 @@ const rawPhraseData = [
   },
   {
     "Category": "Numbers/ቁጥሮች/",
-    "Amharic phrase": "አራት",
     "English translation": "Four",
     "Phonetic translation": "arat",
     "Notes": "Standard number term"
@@ -1339,7 +1337,6 @@ const rawPhraseData = [
   {
     "Category": "Numbers/ቁጥሮች/",
     "Amharic phrase": "ሶስተኛ",
-    "English translation": "Third",
     "Phonetic translation": "sostäňña",
     "Notes": "Ordinal, used in lists or rankings"
   },
@@ -1687,7 +1684,6 @@ const rawPhraseData = [
   },
   {
     "Category": "Color/ቀለም/",
-    "Amharic phrase": "ነጭ",
     "English translation": "White",
     "Phonetic translation": "näčč",
     "Notes": "Used for light-colored items or purity"
@@ -1729,7 +1725,6 @@ const rawPhraseData = [
   },
   {
     "Category": "Color/ቀለም/",
-    "Amharic phrase": "ቀለም",
     "English translation": "Color",
     "Phonetic translation": "qäläm",
     "Notes": "General term for \"color"
@@ -1757,7 +1752,6 @@ const rawPhraseData = [
   },
   {
     "Category": "Color/ቀለም/",
-    "Amharic phrase": "ቀላል ቀለም",
     "English translation": "Light color",
     "Phonetic translation": "qälal qäläm",
     "Notes": "Refers to pastel or light shades"
@@ -2796,9 +2790,9 @@ const rawPhraseData = [
   },
   {
     "Category": "Offensive words/አጸያፊ ቃላት/",
-    "Amharic phrase": "ደላላ",
+    "Amharic phrase": "ቅዘናም",
     "English translation": "Coward",
-    "Phonetic translation": "dälala",
+    "Phonetic translation": "qəzənam",
     "Notes": "Insult implying lack of bravery"
   },
   {
@@ -2851,7 +2845,8 @@ const processPhraseData = (data: any[]): Category[] => {
 
   data.forEach(item => {
     const rawCategoryName = item.Category;
-    const categoryName = rawCategoryName.split('/')[0].trim();
+    // Ensure rawCategoryName is a string before splitting
+    const categoryName = (rawCategoryName ?? '').split('/')[0].trim();
     const categoryId = categoryName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
     if (!categoriesMap.has(categoryId)) {
@@ -2862,12 +2857,21 @@ const processPhraseData = (data: any[]): Category[] => {
       });
     }
 
+    // Ensure all phrase properties are strings before using .replace() or other string methods
+    const amharicPhrase = item["Amharic phrase"] ?? '';
+    const englishTranslation = item["English translation"] ?? '';
+    const phoneticTranslation = item["Phonetic translation"] ?? '';
+    const notes = item.Notes ?? '';
+
     const phrase: Phrase = {
-      id: `${categoryId}-${item["Amharic phrase"].replace(/[^a-zA-Z0-9]/g, '').toLowerCase().substring(0, 15)}-${Math.random().toString(36).substring(2, 6)}`,
-      amharic: item["Amharic phrase"],
-      english: item["English translation"],
-      pronunciation: item["Phonetic translation"],
-      notes: item.Notes,
+      // Ensure amharicPhrase is not empty before attempting replace, or provide a fallback.
+      // Using a more robust ID generation that doesn't rely solely on amharicPhrase might be better.
+      // For now, if amharicPhrase is empty, we'll use a generic placeholder for ID generation.
+      id: `${categoryId}-${amharicPhrase.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().substring(0, 15) || 'no-amharic'}-${Math.random().toString(36).substring(2, 6)}`,
+      amharic: amharicPhrase,
+      english: englishTranslation,
+      pronunciation: phoneticTranslation,
+      notes: notes,
     };
 
     categoriesMap.get(categoryId)?.phrases.push(phrase);
@@ -2883,22 +2887,24 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'categories' | 'phrases'>('categories');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showScrollTopButton, setShowScrollTopButton] = useState(false); // State for scroll to top button visibility
   const itemsPerPage = 9;
 
   // Filtered categories based on search term (memoized for performance)
   const filteredCategories = useMemo(() => {
-  return processedPhraseData
-    .map(categoryData => ({
-      ...categoryData,
-      phrases: categoryData.phrases.filter(
-        phrase =>
-          (phrase.amharic || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (phrase.english || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (phrase.notes || '').toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    }))
-    .filter(categoryData => categoryData.phrases.length > 0);
-}, [searchTerm]);
+    return processedPhraseData
+      .map(categoryData => ({
+        ...categoryData,
+        // Filter phrases if on CategoryListPage and searching
+        phrases: categoryData.phrases.filter(
+          phrase =>
+            phrase.amharic.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            phrase.english.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (phrase.notes && phrase.notes.toLowerCase().includes(searchTerm.toLowerCase()))
+        ),
+      }))
+      .filter(categoryData => categoryData.phrases.length > 0); // Only show categories with matching phrases
+  }, [searchTerm]);
 
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
 
@@ -2926,6 +2932,27 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  // Function to scroll to the top of the page
+  const handleScrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  // Effect to show/hide scroll to top button based on scroll position
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.scrollY > 300) { // Show button after scrolling down 300px
+        setShowScrollTopButton(true);
+      } else {
+        setShowScrollTopButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', toggleVisibility);
+
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col items-center min-h-screen p-4 text-gray-800 bg-gradient-to-br from-blue-50 to-indigo-100 font-inter">
@@ -2938,7 +2965,7 @@ const App: React.FC = () => {
           <p className="text-lg font-light sm:text-xl opacity-90">Your essential guide for communicating in Ethiopia!</p>
         </div>
         <img
-          src="https://placehold.co/150x100/A0522D/FFFFFF?text=Ethiopia" // Placeholder image for Rock_hewn_church.jpg
+          src="/images/Rock_hewn_church.jpg" 
           alt="Amharic Landscape"
           className="object-cover h-24 rounded-lg shadow-md w-36 sm:w-48 sm:h-32"
           onError={(e) => { e.currentTarget.src = 'https://placehold.co/150x100/CCCCCC/333333?text=Image+Error'; }} // Fallback
@@ -2965,28 +2992,42 @@ const App: React.FC = () => {
         />
       )}
 
+      {/* Scroll to Top Button (Global) */}
+      {showScrollTopButton && (
+        <button
+          onClick={handleScrollToTop}
+          className="fixed z-50 p-3 text-white transition-all duration-300 bg-red-600 rounded-full shadow-lg bottom-8 right-8 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
+          aria-label="Scroll to top"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        </button>
+      )}
+
       {/* Footer */}
       <footer className="w-full max-w-4xl p-6 mt-12 text-sm text-center text-gray-600 bg-gray-100 shadow-inner rounded-xl">
         <p className="mb-2 leading-relaxed">
-          100% free Amharic Phrasebook app, built for travel and offline use. Add it to your Home screen and access 670+ essential phrases in 19 topics. Requires no internet connection and offers speech synthesis, so you know how to pronounce Amharic phrases...
+          100% free Amharic Phrasebook app, built for travel and offline use. Add it to your Home screen and access 670+ essential phrases in 17 topics. Requires no internet connection.
         </p>
         <div className="flex justify-center mt-4 space-x-6">
           {/* Placeholder SVG Icons for Social Media */}
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+          <a href="https://web.facebook.com/Eyu.reaper/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
             <svg className="w-6 h-6 text-blue-700 transition-colors duration-200 hover:text-blue-900" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 13.5h2.5l1-4H14v-2c0-1.5 0.5-2 2-2h1.5V2.14c-0.326-0.053-1.66-.14-3.13-.14C11.5 2 9 3.57 9 7.37V9.5H7v4h2v8h4v-8z"/></svg>
           </a>
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+          <a href="https://x.com/eyu_gx" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
             <svg className="w-6 h-6 text-blue-400 transition-colors duration-200 hover:text-blue-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.36 4.6 17.2 4 15.96 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98-3.56-.18-6.7-1.89-8.81-4.48-.37.64-.58 1.39-.58 2.19 0 1.49.75 2.81 1.91 3.59-.7-.02-1.37-.2-1.95-.5v.06c0 2.08 1.48 3.82 3.44 4.2-.36.1-.74.15-1.13.15-.28 0-.55-.03-.81-.08.55 1.7 2.14 2.93 4.02 2.97-1.46 1.14-3.3 1.83-5.32 1.83-.34 0-.68-.02-1.02-.06C3.96 20.3 6.13 21 8.5 21c7.2 0 11.15-5.96 11.15-11.15 0-.17-.0-.33-.01-.5A8.094 8.094 0 0022.46 6z"/></svg>
           </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-            <svg className="w-6 h-6 text-pink-600 transition-colors duration-200 hover:text-pink-800" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.8 2h8.4C20.316 2 22 3.684 22 7.8v8.4c0 4.116-1.684 5.8-5.8 5.8H7.8C3.684 22 2 20.316 2 16.2V7.8C2 3.684 3.684 2 7.8 2zm-.2 2.1v2.8h-2.8v-2.8h2.8zm8.6 0v2.8h-2.8v-2.8h2.8zm-4.3 2.5c2.352 0 4.268 1.916 4.268 4.268s-1.916 4.268-4.268 4.268-4.268-1.916-4.268-4.268 1.916-4.268 4.268-4.268zm0 2.5c-1.112 0-2.012 0.9-2.012 2.012s0.9 2.012 2.012 2.012 2.012-0.9 2.012-2.012-0.9-2.012-2.012-2.012z"/></svg>
-          </a>
-        </div>
+ <a href="https://github.com/eyureaper" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg className="w-6 h-6 text-gray-800 transition-colors duration-200 hover:text-black" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.07 1.532 1.032 1.532 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.339-2.221-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.295 2.748-1.025 2.748-1.025.546 1.378.202 2.397.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.847-2.337 4.695-4.566 4.944.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.744 0 .267.18.577.688.479C19.138 20.2 22 16.447 22 12.021 22 6.484 17.523 2 12 2z"/>
+            </svg>
+          </a>        </div>
         <p className="mt-4">
           Developed with ♥ by <a href="mailto:eyureaper@gmail.com" className="text-red-600 hover:underline">Eyuel Getachew</a>
         </p>
         <p className="mt-1">
-          Logo by Kienan | Pictures by Daily | Data from Wikitravel
+          inspired by Manuel Wieser's work on <a href="https://www.japanese-phrasebook.com" className="text-red-600 hover:underline">Japanese Phrasebook</a>
           <br />
           &copy; 2025 Eyuel Getachew
         </p>

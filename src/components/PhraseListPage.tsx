@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 // Define the structure for a phrase
 interface Phrase {
@@ -22,14 +22,22 @@ const PhraseListPage: React.FC<{
   category: Category;
   onBack: () => void;
 }> = ({ category, onBack }) => {
+  const topRef = useRef<HTMLDivElement>(null);
+
+  const handleScrollToTop = () => {
+    // Scroll the window to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="w-full max-w-3xl p-6 space-y-4 bg-white border border-gray-200 shadow-xl rounded-2xl animate-fade-in">
+    <div className="relative w-full max-w-3xl p-6 space-y-4 bg-white border border-gray-200 shadow-xl rounded-2xl animate-fade-in">
+      <div ref={topRef} />
       <button
         onClick={onBack}
         className="flex items-center px-4 py-2 mb-4 font-semibold text-gray-800 transition duration-200 bg-gray-200 rounded-lg hover:bg-gray-300"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+          <path fillRule="evenodd" d="M12.293 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L8.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
         </svg>
         Back to Categories
       </button>
@@ -56,10 +64,22 @@ const PhraseListPage: React.FC<{
           <p className="text-center text-gray-600">No phrases available for this category.</p>
         )}
       </div>
+      {/* Scroll to Top Button */}
+      {category.phrases.length > 8 && (
+        <button
+          onClick={handleScrollToTop}
+          className="fixed z-50 px-4 py-2 text-white transition bg-indigo-600 rounded-full shadow-lg bottom-8 right-8 hover:bg-indigo-800"
+          aria-label="Scroll to top"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 };
 
 export default PhraseListPage;
 
-export {}; // Add this at the end of the file to make it a module
+export {}; // Added at the end of the file to make it a module
