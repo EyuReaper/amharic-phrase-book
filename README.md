@@ -5,6 +5,9 @@ A free, offline-friendly Amharic phrasebook web app for travelers and learners.
 # Preview
 ![Preview Screenshot 1](/public/images/screenshot-amharicphrasebook-webapp.png).
 
+# Live Deployment
+[https://amharic-phrase-book.vercel.app
+]
 ## Tech Stack
 
 - **React** (with functional components and hooks)
