@@ -21,7 +21,7 @@ A free, offline-friendly Amharic phrasebook web app for travelers and learners.
 
 ## Features
 
-- Browse 670+ essential Amharic phrases in 19 topics
+- Browse 670+ essential Amharic phrases in 17 topics
 - Search phrases by Amharic, English, or notes
 - Category cards with unique placeholder background images
 - Responsive, paginated category grid
