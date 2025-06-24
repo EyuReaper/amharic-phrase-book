@@ -1,6 +1,257 @@
 {
-  "todo": [],
-  "in-progress": [
+  "todo": [
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "performance",
+      "creation_time": "2025-06-22T20:14:07.240Z",
+      "description": {
+        "content": "Notify users when new content is available (service worker update flow).\nAccessibility",
+        "mime": "text/markdown"
+      },
+      "id": "9",
+      "prio": 4,
+      "references": [],
+      "title": "Update Notifications"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Code & Structure",
+      "creation_time": "2025-06-22T20:17:53.323Z",
+      "description": {
+        "content": "Refactor repeated UI into reusable components.",
+        "mime": "text/markdown"
+      },
+      "id": "14",
+      "prio": 3,
+      "references": [],
+      "title": "Component Reuse"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Accessibility",
+      "creation_time": "2025-06-22T20:15:16.331Z",
+      "description": {
+        "content": "Ensure all interactive elements are keyboard accessible.",
+        "mime": "text/markdown"
+      },
+      "id": "10",
+      "prio": 3,
+      "references": [],
+      "title": "Keyboard Navigation"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Content & Data",
+      "creation_time": "2025-06-22T20:19:18.409Z",
+      "description": {
+        "content": "Support UI in multiple languages (not just English)",
+        "mime": "text/markdown"
+      },
+      "id": "16",
+      "prio": 3,
+      "references": [],
+      "title": "Localization"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Content & Data",
+      "creation_time": "2025-06-22T20:18:37.540Z",
+      "description": {
+        "content": "Expand phrase categories or allow community contributions.",
+        "mime": "text/markdown"
+      },
+      "id": "15",
+      "prio": 3,
+      "references": [],
+      "title": "More Categories"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Accessibility",
+      "creation_time": "2025-06-22T20:15:48.130Z",
+      "description": {
+        "content": "Use proper ARIA labels and roles",
+        "mime": "text/markdown"
+      },
+      "id": "11",
+      "prio": 3,
+      "references": [],
+      "title": "Screen Reader Support"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Deployment & SEO",
+      "creation_time": "2025-06-22T20:20:08.766Z",
+      "description": {
+        "content": "Add meta tags, Open Graph, and manifest details for better discoverability.",
+        "mime": "text/markdown"
+      },
+      "id": "17",
+      "prio": 3,
+      "references": [],
+      "title": "SEO Improvements"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Code & Structure",
+      "creation_time": "2025-06-22T20:17:14.514Z",
+      "description": {
+        "content": "Enable stricter TypeScript settings for better type safety.",
+        "mime": "text/markdown"
+      },
+      "id": "13",
+      "prio": 3,
+      "references": [],
+      "title": "TypeScript Strictness"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Code & Structure",
+      "creation_time": "2025-06-22T20:16:37.766Z",
+      "description": {
+        "content": "Add tests for components and logic.",
+        "mime": "text/markdown"
+      },
+      "id": "12",
+      "prio": 3,
+      "references": [],
+      "title": "Unit/Integration Tests"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "UX",
+      "creation_time": "2025-06-22T20:11:50.940Z",
+      "description": {
+        "content": "Add audio playback for Amharic phrases (using Web Speech API or pre-recorded files).",
+        "mime": "text/markdown"
+      },
+      "id": "6",
+      "references": [],
+      "title": "Audio Pronunciation"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "UX",
+      "creation_time": "2025-06-22T20:12:31.447Z",
+      "description": {
+        "content": "Add buttons to copy phrases or share them via social apps.",
+        "mime": "text/markdown"
+      },
+      "id": "7",
+      "references": [],
+      "title": "Copy/Share"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "UX",
+      "creation_time": "2025-06-22T20:08:43.977Z",
+      "description": {
+        "content": " Support dark/light themes for better accessibility. Support dark/light themes for better accessibility.",
+        "mime": "text/markdown"
+      },
+      "id": "3",
+      "references": [],
+      "title": "Dark Mode"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "UX",
+      "creation_time": "2025-06-22T20:09:17.597Z",
+      "description": {
+        "content": "Allow users to mark and quickly access favorite phrases.",
+        "mime": "text/markdown"
+      },
+      "id": "4",
+      "references": [],
+      "title": "Favorites"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "UX",
+      "creation_time": "2025-06-22T20:08:10.833Z",
+      "description": {
+        "content": "Add a custom install prompt for users to add the app to their home screen (PWA).",
+        "mime": "text/markdown"
+      },
+      "id": "2",
+      "references": [],
+      "title": "Install Prompt"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "UX",
+      "creation_time": "2025-06-22T20:11:02.072Z",
+      "description": {
+        "content": "Show recent or suggested searches.",
+        "mime": "text/markdown"
+      },
+      "id": "5",
+      "references": [],
+      "title": "Recent Searches"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "performance",
+      "creation_time": "2025-06-22T20:13:12.562Z",
+      "description": {
+        "content": "Use Workbox strategies for runtime caching of API/images if your data grows.",
+        "mime": "text/markdown"
+      },
+      "id": "8",
+      "references": [],
+      "title": "Smarter Caching"
+    },
+    {
+      "assignedTo": {
+        "name": "EyuReaper"
+      },
+      "category": "Deployment & SEO",
+      "creation_time": "2025-06-22T20:20:45.915Z",
+      "description": {
+        "content": "(Optional) Add privacy-friendly analytics to understand usage (e.g., Plausible, Fathom).",
+        "mime": "text/markdown"
+      },
+      "id": "18",
+      "prio": 3,
+      "references": [],
+      "title": "Analytics"
+    }
+  ],
+  "in-progress": [],
+  "testing": [],
+  "done": [
     {
       "assignedTo": {
         "name": "EyuReaper"
@@ -16,7 +267,5 @@
       "references": [],
       "title": "background image for category cards"
     }
-  ],
-  "testing": [],
-  "done": []
+  ]
 }
