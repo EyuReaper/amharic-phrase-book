@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 
+# AI markdowns
+GEMINI.md
 # testing
 /coverage
 

@@ -1,85 +1,94 @@
-import React, { useRef } from 'react';
+import React from 'react';
+import { Category } from '../data/dataProcessor';
 
-// Define the structure for a phrase
-interface Phrase {
-  id: string;
-  amharic: string;
-  english: string;
-  pronunciation: string;
-  notes?: string;
-}
-
-// Define the structure for a category
-interface Category {
-  id: string; // Unique ID for the category
-  name: string; // Display name for the category (e.g., "Basic")
-  phrases: Phrase[];
-}
-
-// PhraseListPage Component
-// Component for displaying phrases within a selected category
-const PhraseListPage: React.FC<{
+interface PhraseListPageProps {
   category: Category;
   onBack: () => void;
-}> = ({ category, onBack }) => {
-  const topRef = useRef<HTMLDivElement>(null);
+  favorites: string[];
+  onToggleFavorite: (id: string) => void;
+}
 
-  const handleScrollToTop = () => {
-    // Scroll the window to the top of the page
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+const PhraseListPage: React.FC<PhraseListPageProps> = ({ category, onBack, favorites, onToggleFavorite }) => {
   return (
-    <div className="relative w-full max-w-3xl p-6 space-y-4 bg-white border border-gray-200 shadow-xl rounded-2xl animate-fade-in">
-      <div ref={topRef} />
-      <button
-        onClick={onBack}
-        className="flex items-center px-4 py-2 mb-4 font-semibold text-gray-800 transition duration-200 bg-gray-200 rounded-lg hover:bg-gray-300"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M12.293 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L8.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-        </svg>
-        Back to Categories
-      </button>
-      <h2 className="mb-6 text-3xl font-extrabold text-center text-indigo-800">{category.name} Phrases</h2>
-      <div className="space-y-3">
+    <div className="w-full max-w-4xl mx-auto animate-fade-in">
+      {/* Navigation Header */}
+      <div className="flex flex-col items-center justify-between mb-12 space-y-6 md:flex-row md:space-y-0">
+        <button
+          onClick={onBack}
+          className="group flex items-center px-6 py-3 font-bold text-slate-700 dark:text-slate-300 transition-all bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700 hover:shadow-md hover:-translate-x-1"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-3 transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+          Categories
+        </button>
+        <div className="text-center md:text-right">
+          <h2 className="text-4xl font-black text-slate-800 dark:text-white tracking-tight">{category.name}</h2>
+          <p className="mt-1 text-slate-500 dark:text-slate-400 font-medium">{category.phrases.length} Essential Phrases</p>
+        </div>
+      </div>
+
+      {/* Phrases Grid/List */}
+      <div className="grid gap-6">
         {category.phrases.length > 0 ? (
-          category.phrases.map((phrase: Phrase) => (
-            <div key={phrase.id} className="flex items-start p-4 border border-indigo-100 rounded-lg shadow-sm bg-indigo-50">
-              <div className="flex-grow">
-                <p className="mb-1 text-xl font-medium text-indigo-900">
-                  {phrase.amharic}
-                  <span className="ml-2 text-sm italic text-gray-600">[{phrase.pronunciation}]</span>
-                </p>
-                <p className="text-lg text-gray-700">{phrase.english}</p>
-                {phrase.notes && (
-                  <p className="mt-1 text-sm text-gray-500">
-                    <span className="font-semibold">Notes:</span> {phrase.notes}
-                  </p>
-                )}
+          category.phrases.map((phrase) => {
+            const isFavorited = favorites.includes(phrase.id);
+            return (
+              <div 
+                key={phrase.id} 
+                className="relative group bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-8 shadow-sm transition-all duration-300 hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-900 rounded-3xl overflow-hidden"
+              >
+                {/* Highlight Bar */}
+                <div className={`absolute top-0 left-0 w-2 h-full transition-colors duration-300 ${isFavorited ? 'bg-red-500' : 'bg-slate-100 dark:bg-slate-700 group-hover:bg-indigo-600'}`} />
+                
+                <div className="flex flex-col justify-between md:flex-row md:items-center">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-baseline gap-3">
+                      <p className="text-3xl font-bold text-slate-900 dark:text-white font-amharic leading-relaxed">
+                        {phrase.amharic}
+                      </p>
+                      <p className="text-lg font-medium text-slate-400 font-sans italic">
+                        [{phrase.pronunciation}]
+                      </p>
+                    </div>
+                    <p className="text-xl font-semibold text-indigo-600 dark:text-indigo-400 tracking-wide">
+                      {phrase.english}
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-center mt-6 md:mt-0 space-x-4">
+                    {phrase.notes && (
+                      <div className="max-w-xs">
+                        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                           <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                             <span className="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tighter text-xs mr-2">Context</span>
+                             {phrase.notes}
+                           </p>
+                        </div>
+                      </div>
+                    )}
+                    <button 
+                      onClick={() => onToggleFavorite(phrase.id)}
+                      className={`p-3 rounded-2xl transition-all duration-300 ${isFavorited ? 'bg-red-50 text-red-500 dark:bg-red-900/20' : 'bg-slate-50 text-slate-300 hover:text-red-400 dark:bg-slate-900/50'}`}
+                      aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className={`w-6 h-6 ${isFavorited ? 'fill-current' : 'fill-none'}`} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
-          <p className="text-center text-gray-600">No phrases available for this category.</p>
+          <div className="py-20 text-center bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+            <p className="text-xl font-medium text-slate-500 dark:text-slate-400">No phrases found for this category.</p>
+          </div>
         )}
       </div>
-      {/* Scroll to Top Button */}
-      {category.phrases.length > 8 && (
-        <button
-          onClick={handleScrollToTop}
-          className="fixed z-50 px-4 py-2 text-white transition bg-indigo-600 rounded-full shadow-lg bottom-8 right-8 hover:bg-indigo-800"
-          aria-label="Scroll to top"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      )}
     </div>
   );
 };
 
 export default PhraseListPage;
-
-export {}; // Added at the end of the file to make it a module
