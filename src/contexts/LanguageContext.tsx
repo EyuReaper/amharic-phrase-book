@@ -26,6 +26,7 @@ const translations: Record<Language, Record<string, string>> = {
     "favorites.title": "Your Favorites",
     "favorites.practice": "Practice These Phrases",
     back: "Back",
+    feed_me_gursha: "Feed me Gursha",
   },
   am: {
     "app.title": "የአማርኛ ሀረግመጽሐፍ",
@@ -43,6 +44,7 @@ const translations: Record<Language, Record<string, string>> = {
     "favorites.title": "የእርስዎ ምርጫዎች",
     "favorites.practice": "እነዚህን ቃላት ይለማመዱ",
     back: "ተመለስ",
+    feed_me_gursha: "ጉርሻ አጉርሱሻ",
   },
 };
 

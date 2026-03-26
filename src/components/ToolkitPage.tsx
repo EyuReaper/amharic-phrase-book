@@ -1,16 +1,47 @@
-import React, { useState } from 'react';
-import { Calculator, Phone, ListNumbers, Question } from '@phosphor-icons/react';
+import React, { useState, useEffect } from 'react';
+import { Calculator, Phone, ListNumbers, ArrowsClockwise } from '@phosphor-icons/react';
 
 const ToolkitPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [amount, setAmount] = useState<string>('1');
   const [currency, setCurrency] = useState<'USD' | 'EUR'>('USD');
-  
-  // Approximate rate - in a real app, fetch this live
-  const rates = { USD: 120, EUR: 130 };
-  const converted = parseFloat(amount || '0') * rates[currency];
+  const [rates, setRates] = useState<Record<string, number>>({ USD: 120, EUR: 130 });
+  const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+
+  const fetchRates = async () => {
+    setLoading(true);
+    try {
+      // Using a reliable public API for latest rates
+      const response = await fetch('https://open.er-api.com/v6/latest/USD');
+      const data = await response.json();
+      if (data && data.rates && data.rates.ETB) {
+        const usdToEtb = data.rates.ETB;
+        // Basic calculation for EUR based on cross rate if needed, 
+        // but let's fetch EUR specifically if we want accuracy
+        const eurResponse = await fetch('https://open.er-api.com/v6/latest/EUR');
+        const eurData = await eurResponse.json();
+        
+        setRates({
+          USD: usdToEtb,
+          EUR: eurData.rates.ETB || (usdToEtb * 1.08) // Fallback to a reasonable cross-rate
+        });
+        setLastUpdated(new Date().toLocaleTimeString());
+      }
+    } catch (error) {
+      console.error("Failed to fetch rates:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRates();
+  }, []);
+
+  const converted = parseFloat(amount || '0') * (rates[currency] || 0);
 
   return (
-    <div className="w-full max-w-4xl mx-auto animate-fade-in pb-20">
+    <div className="w-full max-w-4xl mx-auto animate-fade-in pb-20 px-4">
       {/* Header */}
       <div className="flex flex-col items-center justify-between mb-12 space-y-6 md:flex-row md:space-y-0">
         <button
@@ -36,11 +67,21 @@ const ToolkitPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </div>
           
           <div className="relative z-10">
-            <div className="flex items-center mb-6 space-x-4">
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400">
-                <Calculator size={32} weight="duotone" />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl text-indigo-600 dark:text-indigo-400">
+                  <Calculator size={32} weight="duotone" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Currency Estimator</h3>
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Currency Estimator</h3>
+              <button 
+                onClick={fetchRates}
+                disabled={loading}
+                className={`p-2 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-indigo-600 transition-all ${loading ? 'animate-spin' : ''}`}
+                title="Refresh Rates"
+              >
+                <ArrowsClockwise size={20} />
+              </button>
             </div>
 
             <div className="space-y-6">
@@ -73,8 +114,11 @@ const ToolkitPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
               <div className="p-6 bg-indigo-600 rounded-3xl text-white text-center shadow-lg shadow-indigo-200 dark:shadow-none">
                 <p className="text-indigo-200 font-medium text-sm uppercase tracking-widest mb-1">Approximately</p>
-                <p className="text-4xl font-black">{converted.toLocaleString()} ETB</p>
-                <p className="text-xs text-indigo-300 mt-2 opacity-70">*Rates are estimates only</p>
+                <p className="text-4xl font-black">{converted.toLocaleString(undefined, { maximumFractionDigits: 2 })} ETB</p>
+                <div className="flex items-center justify-center mt-2 space-x-2 text-[10px] text-indigo-300 opacity-70">
+                  <span>*Live market rates</span>
+                  {lastUpdated && <span>• Updated {lastUpdated}</span>}
+                </div>
               </div>
             </div>
           </div>
@@ -145,7 +189,7 @@ const ToolkitPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 { en: '100', am: 'መቶ (Meto)' },
                 { en: '1000', am: 'ሺህ (Shih)' },
               ].map((num) => (
-                <div key={num.en} className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center">
+                <div key={num.en} className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center hover:scale-105 transition-transform cursor-default">
                   <span className="text-2xl font-black text-slate-900 dark:text-white mb-1">{num.en}</span>
                   <span className="text-sm font-medium text-slate-500 dark:text-slate-400">{num.am}</span>
                 </div>

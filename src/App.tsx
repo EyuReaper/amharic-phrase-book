@@ -6,7 +6,14 @@ import FavoritesPage from "./components/FavoritesPage";
 import ToolkitPage from "./components/ToolkitPage";
 import { Category, Phrase, processPhraseData } from "./data/dataProcessor";
 import Fuse from "fuse.js";
-import { Heart, Toolbox, BookOpen, Fire, Globe } from "@phosphor-icons/react";
+import {
+  Heart,
+  Toolbox,
+  BookOpen,
+  Fire,
+  Globe,
+  HandHeart,
+} from "@phosphor-icons/react";
 import { useLanguage } from "./contexts/LanguageContext";
 
 const App: React.FC = () => {
@@ -45,9 +52,9 @@ const App: React.FC = () => {
     if (lastVisit !== today) {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      
+
       if (lastVisit === yesterday.toDateString()) {
-        setStreak(prev => {
+        setStreak((prev) => {
           const newStreak = prev + 1;
           localStorage.setItem("streak", JSON.stringify(newStreak));
           return newStreak;
@@ -88,12 +95,12 @@ const App: React.FC = () => {
   }, []);
 
   const fuse = useMemo(() => {
-    const allPhrases = categories.flatMap((cat) => 
-      cat.phrases.map(p => ({ ...p, categoryName: cat.name }))
+    const allPhrases = categories.flatMap((cat) =>
+      cat.phrases.map((p) => ({ ...p, categoryName: cat.name })),
     );
-    
+
     return new Fuse(allPhrases, {
-      keys: ['amharic', 'english', 'notes', 'categoryName'],
+      keys: ["amharic", "english", "notes", "categoryName"],
       threshold: 0.3,
       distance: 100,
     });
@@ -103,12 +110,14 @@ const App: React.FC = () => {
     if (!searchTerm) return categories;
 
     const results = fuse.search(searchTerm);
-    const resultIds = new Set(results.map(r => r.item.id));
+    const resultIds = new Set(results.map((r) => r.item.id));
 
     return categories
       .map((categoryData) => ({
         ...categoryData,
-        phrases: categoryData.phrases.filter((phrase) => resultIds.has(phrase.id)),
+        phrases: categoryData.phrases.filter((phrase) =>
+          resultIds.has(phrase.id),
+        ),
       }))
       .filter((categoryData) => categoryData.phrases.length > 0);
   }, [searchTerm, categories, fuse]);
@@ -162,7 +171,7 @@ const App: React.FC = () => {
         <div className="flex flex-col items-center">
           <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-lg font-medium text-slate-600">
-            {t('loading')}
+            {t("loading")}
           </p>
         </div>
       </div>
@@ -170,11 +179,28 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen pb-12 font-sans bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-500">
+    <div className="relative flex flex-col items-center min-h-screen pb-12 font-sans bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-500">
       {/* Background Decor */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-red-100 dark:bg-red-900/20 blur-[120px]"></div>
         <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[40%] rounded-full bg-indigo-100 dark:bg-indigo-900/20 blur-[100px]"></div>
+      </div>
+
+      {/* Support Button - Top Right */}
+      <div className="absolute top-4 right-4 z-50">
+        <a
+          href="https:/gurshaplus.com/EyuReaper"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center px-4 py-2 bg-gradient-to-r from-orange-400 to-red-500 text-white font-black text-sm rounded-2xl shadow-lg hover:shadow-orange-200 dark:hover:shadow-none hover:-translate-y-1 transition-all active:scale-95 border-2 border-white/20"
+        >
+          <HandHeart
+            size={20}
+            weight="fill"
+            className="mr-2 group-hover:animate-bounce"
+          />
+          <span className="font-amharic">{t("feed_me_gursha")}</span>
+        </a>
       </div>
 
       {/* Header */}
@@ -182,19 +208,41 @@ const App: React.FC = () => {
         <div className="flex flex-col items-center justify-between md:flex-row">
           <div className="flex-1">
             {/* Top Navigation */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-6">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-6 pt-12 md:pt-0">
               <button
                 onClick={() => setDarkMode(!darkMode)}
                 className="p-3 bg-white dark:bg-slate-800 shadow-xl rounded-2xl hover:scale-110 active:scale-95 transition-all border border-slate-100 dark:border-slate-700"
                 aria-label="Toggle dark mode"
               >
                 {darkMode ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-yellow-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"
+                    />
                   </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-indigo-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
                   </svg>
                 )}
               </button>
@@ -205,10 +253,13 @@ const App: React.FC = () => {
                 aria-label="Toggle Language"
               >
                 <Globe size={20} weight="duotone" />
-                {language === 'en' ? 'AM' : 'EN'}
+                {language === "en" ? "AM" : "EN"}
               </button>
 
-              <div className="flex items-center px-4 py-3 font-black text-orange-500 bg-orange-50 dark:bg-orange-900/20 rounded-2xl border border-orange-100 dark:border-orange-900/50 shadow-sm" title="Daily Streak">
+              <div
+                className="flex items-center px-4 py-3 font-black text-orange-500 bg-orange-50 dark:bg-orange-900/20 rounded-2xl border border-orange-100 dark:border-orange-900/50 shadow-sm"
+                title="Daily Streak"
+              >
                 <Fire size={20} weight="fill" className="mr-2 animate-pulse" />
                 {streak} Days
               </div>
@@ -216,23 +267,35 @@ const App: React.FC = () => {
               <button
                 onClick={() => setCurrentView("favorites")}
                 className={`flex items-center px-5 py-3 font-bold rounded-2xl transition-all shadow-lg active:scale-95 border
-                  ${currentView === "favorites" 
-                    ? "bg-red-500 text-white border-red-500 shadow-red-200 dark:shadow-none" 
-                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"}`}
+                  ${
+                    currentView === "favorites"
+                      ? "bg-red-500 text-white border-red-500 shadow-red-200 dark:shadow-none"
+                      : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  }`}
               >
-                <Heart size={20} weight={currentView === "favorites" ? "fill" : "duotone"} className="mr-2" />
-                {t('nav.favorites')}
+                <Heart
+                  size={20}
+                  weight={currentView === "favorites" ? "fill" : "duotone"}
+                  className="mr-2"
+                />
+                {t("nav.favorites")}
               </button>
 
               <button
                 onClick={() => setCurrentView("toolkit")}
                 className={`flex items-center px-5 py-3 font-bold rounded-2xl transition-all shadow-lg active:scale-95 border
-                  ${currentView === "toolkit" 
-                    ? "bg-indigo-600 text-white border-indigo-600 shadow-indigo-200 dark:shadow-none" 
-                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"}`}
+                  ${
+                    currentView === "toolkit"
+                      ? "bg-indigo-600 text-white border-indigo-600 shadow-indigo-200 dark:shadow-none"
+                      : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  }`}
               >
-                <Toolbox size={20} weight={currentView === "toolkit" ? "fill" : "duotone"} className="mr-2" />
-                {t('nav.toolkit')}
+                <Toolbox
+                  size={20}
+                  weight={currentView === "toolkit" ? "fill" : "duotone"}
+                  className="mr-2"
+                />
+                {t("nav.toolkit")}
               </button>
 
               {currentView !== "anki" && (
@@ -241,20 +304,26 @@ const App: React.FC = () => {
                   className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:bg-indigo-700 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center"
                 >
                   <BookOpen size={20} weight="duotone" className="mr-2" />
-                  {t('nav.practice')}
+                  {t("nav.practice")}
                 </button>
               )}
             </div>
 
             <h1 className="text-5xl font-black tracking-tight md:text-7xl">
-              {language === 'en' ? (
-                <>AMHARIC<span className="text-red-600">.</span><br className="md:hidden" /><span className="text-indigo-600 dark:text-indigo-400">PhraseBook</span></>
+              {language === "en" ? (
+                <>
+                  AMHARIC<span className="text-red-600">.</span>
+                  <br className="md:hidden" />
+                  <span className="text-indigo-600 dark:text-indigo-400">
+                    PhraseBook
+                  </span>
+                </>
               ) : (
-                <>{t('app.title')}</>
+                <>{t("app.title")}</>
               )}
             </h1>
             <p className="mt-4 text-xl font-medium text-slate-500 dark:text-slate-400 max-w-lg">
-              {t('app.subtitle')}
+              {t("app.subtitle")}
             </p>
           </div>
           <div className="hidden md:block">
@@ -295,17 +364,29 @@ const App: React.FC = () => {
             />
           )
         ) : currentView === "anki" ? (
-          <AnkiMode 
-            phrases={selectedCategory ? selectedCategory.phrases : categories.flatMap(c => c.phrases)} 
-            onExit={() => setCurrentView(selectedCategory ? "phrases" : "categories")}
+          <AnkiMode
+            phrases={
+              selectedCategory
+                ? selectedCategory.phrases
+                : categories.flatMap((c) => c.phrases)
+            }
+            onExit={() =>
+              setCurrentView(selectedCategory ? "phrases" : "categories")
+            }
           />
         ) : currentView === "favorites" ? (
           <FavoritesPage
             favorites={favorites}
-            phrases={categories.flatMap(c => c.phrases)}
+            phrases={categories.flatMap((c) => c.phrases)}
             onToggleFavorite={handleToggleFavorite}
             onPractice={() => {
-              setSelectedCategory({ id: 'favorites', name: 'My Favorites', phrases: categories.flatMap(c => c.phrases).filter(p => favorites.includes(p.id)) });
+              setSelectedCategory({
+                id: "favorites",
+                name: "My Favorites",
+                phrases: categories
+                  .flatMap((c) => c.phrases)
+                  .filter((p) => favorites.includes(p.id)),
+              });
               setCurrentView("anki");
             }}
             onBack={handleBackToCategories}
@@ -417,8 +498,8 @@ const App: React.FC = () => {
         </div>
         <div className="mt-12 text-slate-400 dark:text-slate-500 text-sm">
           <p>
-            &copy; 2025 Made with 🩶 Eyuel Getachew. Inspired by Japanese
-            Phrasebook.
+            &copy; {new Date().getFullYear()} Made with 🩶 Eyuel Getachew.
+            Inspired by Japanese Phrasebook.
           </p>
         </div>
       </footer>
