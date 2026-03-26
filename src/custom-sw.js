@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-/* global importScripts, workbox, __WB_MANIFEST */
+/* global importScripts, workbox */
 
 // Import Workbox libraries
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
@@ -13,6 +13,7 @@ self.addEventListener('message', (event) => {
 
 workbox.core.clientsClaim();
 
-// Fix for __WB_MANIFEST warning: use it directly if global or through self
+// The Workbox InjectManifest plugin will search for this string and replace it.
+// eslint-disable-next-line no-restricted-globals
 const manifest = self.__WB_MANIFEST || [];
 workbox.precaching.precacheAndRoute(manifest);

@@ -4,7 +4,7 @@ import PhraseListPage from "./components/PhraseListPage";
 import AnkiMode from "./components/AnkiMode";
 import FavoritesPage from "./components/FavoritesPage";
 import ToolkitPage from "./components/ToolkitPage";
-import { Category, Phrase, processPhraseData } from "./data/dataProcessor";
+import { Category, processPhraseData } from "./data/dataProcessor";
 import Fuse from "fuse.js";
 import {
   Heart,
