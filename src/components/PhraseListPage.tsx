@@ -1,5 +1,6 @@
 import React from 'react';
 import { Category } from '../data/dataProcessor';
+import { SpeakerHigh } from '@phosphor-icons/react';
 
 interface PhraseListPageProps {
   category: Category;
@@ -9,6 +10,17 @@ interface PhraseListPageProps {
 }
 
 const PhraseListPage: React.FC<PhraseListPageProps> = ({ category, onBack, favorites, onToggleFavorite }) => {
+  const handlePlayAudio = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      // Try to set Amharic voice if available, otherwise default might be used (often falls back to English pronunciation which is bad, but better than nothing for now?)
+      // Actually for Amharic, if the OS doesn't support it, it might just read letters.
+      // Let's try setting lang to 'am-ET'
+      utterance.lang = 'am-ET';
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto animate-fade-in">
       {/* Navigation Header */}
@@ -43,10 +55,19 @@ const PhraseListPage: React.FC<PhraseListPageProps> = ({ category, onBack, favor
                 
                 <div className="flex flex-col justify-between md:flex-row md:items-center">
                   <div className="space-y-2">
-                    <div className="flex flex-wrap items-baseline gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                       <p className="text-3xl font-bold text-slate-900 dark:text-white font-amharic leading-relaxed">
                         {phrase.amharic}
                       </p>
+                      <button 
+                        onClick={() => handlePlayAudio(phrase.amharic)}
+                        className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors bg-slate-50 dark:bg-slate-900 rounded-full"
+                        title="Listen"
+                      >
+                        <SpeakerHigh size={20} weight="duotone" />
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap items-baseline gap-2">
                       <p className="text-lg font-medium text-slate-400 font-sans italic">
                         [{phrase.pronunciation}]
                       </p>

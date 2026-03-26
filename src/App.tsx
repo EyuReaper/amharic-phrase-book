@@ -2,12 +2,18 @@ import React, { useState, useCallback, useMemo, useEffect } from "react";
 import CategoryListPage from "./components/CategoryListPage";
 import PhraseListPage from "./components/PhraseListPage";
 import AnkiMode from "./components/AnkiMode";
+import FavoritesPage from "./components/FavoritesPage";
+import ToolkitPage from "./components/ToolkitPage";
 import { Category, Phrase, processPhraseData } from "./data/dataProcessor";
+import Fuse from "fuse.js";
+import { Heart, Toolbox, BookOpen, Fire, Globe } from "@phosphor-icons/react";
+import { useLanguage } from "./contexts/LanguageContext";
 
 const App: React.FC = () => {
+  const { t, language, toggleLanguage } = useLanguage();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentView, setCurrentView] = useState<
-    "categories" | "phrases" | "anki"
+    "categories" | "phrases" | "anki" | "favorites" | "toolkit"
   >("categories");
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null,
@@ -24,8 +30,35 @@ const App: React.FC = () => {
     const saved = localStorage.getItem("favorites");
     return saved ? JSON.parse(saved) : [];
   });
+  const [streak, setStreak] = useState<number>(() => {
+    const saved = localStorage.getItem("streak");
+    return saved ? JSON.parse(saved) : 0;
+  });
 
   const itemsPerPage = 9;
+
+  useEffect(() => {
+    // Streak Logic
+    const lastVisit = localStorage.getItem("lastVisit");
+    const today = new Date().toDateString();
+
+    if (lastVisit !== today) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (lastVisit === yesterday.toDateString()) {
+        setStreak(prev => {
+          const newStreak = prev + 1;
+          localStorage.setItem("streak", JSON.stringify(newStreak));
+          return newStreak;
+        });
+      } else {
+        setStreak(1);
+        localStorage.setItem("streak", JSON.stringify(1));
+      }
+      localStorage.setItem("lastVisit", today);
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
@@ -54,22 +87,31 @@ const App: React.FC = () => {
       });
   }, []);
 
+  const fuse = useMemo(() => {
+    const allPhrases = categories.flatMap((cat) => 
+      cat.phrases.map(p => ({ ...p, categoryName: cat.name }))
+    );
+    
+    return new Fuse(allPhrases, {
+      keys: ['amharic', 'english', 'notes', 'categoryName'],
+      threshold: 0.3,
+      distance: 100,
+    });
+  }, [categories]);
+
   const filteredCategories = useMemo(() => {
     if (!searchTerm) return categories;
+
+    const results = fuse.search(searchTerm);
+    const resultIds = new Set(results.map(r => r.item.id));
 
     return categories
       .map((categoryData) => ({
         ...categoryData,
-        phrases: categoryData.phrases.filter(
-          (phrase) =>
-            phrase.amharic.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            phrase.english.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (phrase.notes &&
-              phrase.notes.toLowerCase().includes(searchTerm.toLowerCase())),
-        ),
+        phrases: categoryData.phrases.filter((phrase) => resultIds.has(phrase.id)),
       }))
       .filter((categoryData) => categoryData.phrases.length > 0);
-  }, [searchTerm, categories]);
+  }, [searchTerm, categories, fuse]);
 
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
 
@@ -120,7 +162,7 @@ const App: React.FC = () => {
         <div className="flex flex-col items-center">
           <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-lg font-medium text-slate-600">
-            Loading your Amharic guide...
+            {t('loading')}
           </p>
         </div>
       </div>
@@ -139,77 +181,80 @@ const App: React.FC = () => {
       <header className="relative z-10 w-full max-w-5xl px-6 py-12 text-center md:text-left">
         <div className="flex flex-col items-center justify-between md:flex-row">
           <div className="flex-1">
-            <div className="flex items-center justify-center md:justify-start space-x-4 mb-4">
+            {/* Top Navigation */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-6">
               <button
                 onClick={() => setDarkMode(!darkMode)}
-                className="p-3 bg-white dark:bg-slate-800 shadow-xl rounded-2xl hover:scale-110 active:scale-95 transition-all"
+                className="p-3 bg-white dark:bg-slate-800 shadow-xl rounded-2xl hover:scale-110 active:scale-95 transition-all border border-slate-100 dark:border-slate-700"
                 aria-label="Toggle dark mode"
               >
                 {darkMode ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-yellow-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"
-                    />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
                   </svg>
                 ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-indigo-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                    />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
                 )}
               </button>
+
+              <button
+                onClick={toggleLanguage}
+                className="p-3 bg-white dark:bg-slate-800 shadow-xl rounded-2xl hover:scale-110 active:scale-95 transition-all border border-slate-100 dark:border-slate-700 font-bold text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2"
+                aria-label="Toggle Language"
+              >
+                <Globe size={20} weight="duotone" />
+                {language === 'en' ? 'AM' : 'EN'}
+              </button>
+
+              <div className="flex items-center px-4 py-3 font-black text-orange-500 bg-orange-50 dark:bg-orange-900/20 rounded-2xl border border-orange-100 dark:border-orange-900/50 shadow-sm" title="Daily Streak">
+                <Fire size={20} weight="fill" className="mr-2 animate-pulse" />
+                {streak} Days
+              </div>
+
+              <button
+                onClick={() => setCurrentView("favorites")}
+                className={`flex items-center px-5 py-3 font-bold rounded-2xl transition-all shadow-lg active:scale-95 border
+                  ${currentView === "favorites" 
+                    ? "bg-red-500 text-white border-red-500 shadow-red-200 dark:shadow-none" 
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"}`}
+              >
+                <Heart size={20} weight={currentView === "favorites" ? "fill" : "duotone"} className="mr-2" />
+                {t('nav.favorites')}
+              </button>
+
+              <button
+                onClick={() => setCurrentView("toolkit")}
+                className={`flex items-center px-5 py-3 font-bold rounded-2xl transition-all shadow-lg active:scale-95 border
+                  ${currentView === "toolkit" 
+                    ? "bg-indigo-600 text-white border-indigo-600 shadow-indigo-200 dark:shadow-none" 
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"}`}
+              >
+                <Toolbox size={20} weight={currentView === "toolkit" ? "fill" : "duotone"} className="mr-2" />
+                {t('nav.toolkit')}
+              </button>
+
               {currentView !== "anki" && (
                 <button
                   onClick={() => setCurrentView("anki")}
                   className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:bg-indigo-700 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
-                  Practice Mode
+                  <BookOpen size={20} weight="duotone" className="mr-2" />
+                  {t('nav.practice')}
                 </button>
               )}
             </div>
+
             <h1 className="text-5xl font-black tracking-tight md:text-7xl">
-              AMHARIC<span className="text-red-600">.</span>
-              <br className="md:hidden" />
-              <span className="text-indigo-600 dark:text-indigo-400">
-                PhraseBook
-              </span>
+              {language === 'en' ? (
+                <>AMHARIC<span className="text-red-600">.</span><br className="md:hidden" /><span className="text-indigo-600 dark:text-indigo-400">PhraseBook</span></>
+              ) : (
+                <>{t('app.title')}</>
+              )}
             </h1>
             <p className="mt-4 text-xl font-medium text-slate-500 dark:text-slate-400 max-w-lg">
-              Unlock the heartbeat of Ethiopia. Essential phrases for travelers,
-              learners, and dreamers.
+              {t('app.subtitle')}
             </p>
           </div>
           <div className="hidden md:block">
@@ -249,17 +294,24 @@ const App: React.FC = () => {
               onToggleFavorite={handleToggleFavorite}
             />
           )
-        ) : (
-          <AnkiMode
-            phrases={
-              selectedCategory
-                ? selectedCategory.phrases
-                : categories.flatMap((c) => c.phrases)
-            }
-            onExit={() =>
-              setCurrentView(selectedCategory ? "phrases" : "categories")
-            }
+        ) : currentView === "anki" ? (
+          <AnkiMode 
+            phrases={selectedCategory ? selectedCategory.phrases : categories.flatMap(c => c.phrases)} 
+            onExit={() => setCurrentView(selectedCategory ? "phrases" : "categories")}
           />
+        ) : currentView === "favorites" ? (
+          <FavoritesPage
+            favorites={favorites}
+            phrases={categories.flatMap(c => c.phrases)}
+            onToggleFavorite={handleToggleFavorite}
+            onPractice={() => {
+              setSelectedCategory({ id: 'favorites', name: 'My Favorites', phrases: categories.flatMap(c => c.phrases).filter(p => favorites.includes(p.id)) });
+              setCurrentView("anki");
+            }}
+            onBack={handleBackToCategories}
+          />
+        ) : (
+          <ToolkitPage onBack={handleBackToCategories} />
         )}
       </main>
 

@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-globals */
-/* global importScripts, workbox, self, __WB_MANIFEST */
-/* eslint no-undef: 0 */
+/* global importScripts, workbox, __WB_MANIFEST */
 
 // Import Workbox libraries
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
@@ -13,4 +12,7 @@ self.addEventListener('message', (event) => {
 });
 
 workbox.core.clientsClaim();
-workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
+
+// Fix for __WB_MANIFEST warning: use it directly if global or through self
+const manifest = self.__WB_MANIFEST || [];
+workbox.precaching.precacheAndRoute(manifest);
